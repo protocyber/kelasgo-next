@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { ModeToggle } from '@/components/theme-toggle';
 
 // Mock API function - replace with your actual API call
 async function fetchDashboardData() {
@@ -67,6 +68,7 @@ export default function DashboardPage() {
               <User className="h-4 w-4" />
               <span className="text-sm font-medium">{user?.name}</span>
             </div>
+            <ModeToggle />
             <Button variant="outline" size="sm" onClick={logout}>
               <LogOut className="mr-2 h-4 w-4" />
               Logout
