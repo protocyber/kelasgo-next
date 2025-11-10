@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,20 +20,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-
-const registrationSchema = z
-  .object({
-    fullName: z.string().min(2, "Full name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type RegistrationFormData = z.infer<typeof registrationSchema>;
+import { registrationSchema, RegistrationFormData } from "./registration.action";
 
 export default function RegistrationScreen() {
   const router = useRouter();
@@ -45,12 +31,12 @@ export default function RegistrationScreen() {
       return registrationApi(values);
     },
     onSuccess: () => {
-      // After successful registration, redirect to login
+      // Setelah registrasi berhasil, arahkan ke halaman login
       router.push("/login");
     },
     onError: (err: unknown) => {
       const message = (err as { message?: string; } | undefined)?.message ||
-        "Registration failed. Please try again.";
+        "Registrasi gagal. Silakan coba lagi.";
       setError(message);
     },
   });
@@ -82,8 +68,8 @@ export default function RegistrationScreen() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Enter your details to registration</CardDescription>
+          <CardTitle className="text-2xl">Buat Akun</CardTitle>
+          <CardDescription>Masukkan data diri Anda untuk mendaftar</CardDescription>
         </CardHeader>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -96,11 +82,11 @@ export default function RegistrationScreen() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
+              <Label htmlFor="fullName">Nama Lengkap</Label>
               <Input
                 id="fullName"
                 type="text"
-                placeholder="Your full name"
+                placeholder="Nama lengkap Anda"
                 {...register("fullName")}
               />
               {errors.fullName && (
@@ -115,7 +101,7 @@ export default function RegistrationScreen() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="email@contoh.com"
                 {...register("email")}
               />
               {errors.email && (
@@ -126,11 +112,11 @@ export default function RegistrationScreen() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Kata Sandi</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Masukkan kata sandi"
                 {...register("password")}
               />
               {errors.password && (
@@ -141,11 +127,11 @@ export default function RegistrationScreen() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Konfirmasi Kata Sandi</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Re-enter your password"
+                placeholder="Ulangi kata sandi"
                 {...register("confirmPassword")}
               />
               {errors.confirmPassword && (
@@ -160,15 +146,15 @@ export default function RegistrationScreen() {
               {isSubmitting || mutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
+                  Membuat akun...
                 </>
               ) : (
-                "Create account"
+                "Buat Akun"
               )}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/login" className="underline">Sign in</Link>
+              Sudah punya akun?{" "}
+              <Link href="/login" className="underline">Masuk</Link>
             </p>
           </CardFooter>
         </form>

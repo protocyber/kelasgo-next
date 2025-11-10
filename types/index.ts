@@ -33,3 +33,22 @@ export type LoginResponse = {
   refresh_expires_at: string;
   user: UserInfo;
 };
+
+// Tenant API
+export type CreateTenantInput = {
+  name: string;
+  domain?: string;
+  contact_email?: string;
+  phone?: string;
+  address?: string;
+};
+
+export type TenantResponse = {
+  id: string;
+  name: string;
+  domain?: string;
+  contact_email?: string;
+  phone?: string;
+  address?: string;
+  created_at: string;
+};

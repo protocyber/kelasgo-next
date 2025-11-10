@@ -15,20 +15,8 @@ import { LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ModeToggle } from '@/components/theme-toggle';
-
-// Mock API function - replace with your actual API call
-async function fetchDashboardData() {
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return {
-    stats: [
-      { label: "Total Users", value: "1,234" },
-      { label: "Active Sessions", value: "567" },
-      { label: "Revenue", value: "$12,345" },
-      { label: "Growth", value: "+23%" },
-    ],
-  };
-}
+import { fetchDashboardData } from './dashboard.action';
+import CreateTenantModal from './create-tenant';
 
 export default function DashboardScreen() {
   const { user, logout, isLoading, isAuthenticated } = useAuth();
@@ -62,8 +50,9 @@ export default function DashboardScreen() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl font-bold">Dasbor</h1>
           <div className="flex items-center gap-4">
+            <CreateTenantModal />
             <div className="flex items-center gap-2">
               <User className="h-4 w-4" />
               <span className="text-sm font-medium">{user?.name}</span>
@@ -71,7 +60,7 @@ export default function DashboardScreen() {
             <ModeToggle />
             <Button variant="outline" size="sm" onClick={logout}>
               <LogOut className="mr-2 h-4 w-4" />
-              Logout
+              Keluar
             </Button>
           </div>
         </div>
@@ -79,9 +68,9 @@ export default function DashboardScreen() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold">Welcome back, {user?.name}!</h2>
+          <h2 className="text-3xl font-bold">Selamat datang kembali, {user?.name}!</h2>
           <p className="text-muted-foreground">
-            Here&apos;s what&apos;s happening with your account today.
+            Berikut adalah ringkasan akun Anda hari ini.
           </p>
         </div>
 
@@ -108,14 +97,14 @@ export default function DashboardScreen() {
 
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>Aktivitas Terbaru</CardTitle>
             <CardDescription>
-              Your latest activities and updates
+              Aktivitas dan pembaruan terakhir Anda
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              No recent activity to display.
+              Belum ada aktivitas terbaru untuk ditampilkan.
             </p>
           </CardContent>
         </Card>

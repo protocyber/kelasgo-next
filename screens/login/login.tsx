@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,13 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import { loginSchema, LoginFormData } from "./login.action";
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -48,7 +41,7 @@ export default function LoginScreen() {
       setError(null);
       await login(data.email, data.password);
     } catch {
-      setError("Invalid credentials. Please try again.");
+      setError("Email atau kata sandi salah. Silakan coba lagi.");
     }
   };
 
@@ -56,9 +49,9 @@ export default function LoginScreen() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
+          <CardTitle className="text-2xl">Selamat datang kembali</CardTitle>
           <CardDescription>
-            Sign in to your account to continue
+            Masuk ke akun Anda untuk melanjutkan
           </CardDescription>
         </CardHeader>
         <form
@@ -76,7 +69,7 @@ export default function LoginScreen() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="email@contoh.com"
                 {...register("email")}
               />
               {errors.email && (
@@ -87,11 +80,11 @@ export default function LoginScreen() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Kata Sandi</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Masukkan kata sandi"
                 {...register("password")}
               />
               {errors.password && (
@@ -110,14 +103,14 @@ export default function LoginScreen() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  Masuk...
                 </>
               ) : (
-                "Sign in"
+                "Masuk"
               )}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account? <Link href="/registration" className="underline">Create one</Link>
+              Belum punya akun? <Link href="/registration" className="underline">Buat akun</Link>
             </p>
           </CardFooter>
         </form>
