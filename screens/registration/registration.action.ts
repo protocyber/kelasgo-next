@@ -28,14 +28,13 @@ export function useRegistrationAction() {
   const { mutation } = useRegistrationFunc({
     onSuccess: () => {
       // Setelah registrasi berhasil, arahkan ke halaman login
-      toast.custom(() =>
+      toast.custom(id =>
         createElement(SplashToast, {
           message: 'Registrasi Berhasil. Anda akan diarahkan ke halaman login.',
-          duration: 3,
+          duration: 4,
+          toastId: id,
           onComplete: () => {
-            setTimeout(() => {
-              router.push('/login');
-            }, 0);
+            router.push('/login');
           },
         })
       );
