@@ -1,11 +1,7 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import LoadingButton from '@/components/loading-button';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
@@ -14,36 +10,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { loginSchema, LoginFormData } from "./login.action";
+import { useLoginAction } from "./login.action";
 
 export default function LoginScreen() {
-  const { login } = useAuth();
-  const [error, setError] = useState<string | null>(null);
 
-  const {
-    register,
+  const { register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const onSubmit = async (data: LoginFormData) => {
-    try {
-      setError(null);
-      await login(data.email, data.password);
-    } catch {
-      setError("Email atau kata sandi salah. Silakan coba lagi.");
-    }
-  };
+    onSubmit,
+    isSubmitting,
+    errors,
+    error,
+  } = useLoginAction();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -94,21 +74,13 @@ export default function LoginScreen() {
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex w-full flex-col gap-3">
-            <Button
+          <CardFooter className="flex w-full flex-col gap-3 mt-4">
+            <LoadingButton
               type="submit"
-              className="w-full"
-              disabled={isSubmitting}
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Masuk...
-                </>
-              ) : (
-                "Masuk"
-              )}
-            </Button>
+              Masuk
+            </LoadingButton>
             <p className="text-center text-sm text-muted-foreground">
               Belum punya akun? <Link href="/registration" className="underline">Buat akun</Link>
             </p>
