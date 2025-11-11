@@ -11,7 +11,7 @@ export default function LoadingButton({
   return (
     <Button
       {...props}
-      className={`w-full ${props.className || ''}`}
+      className={`${props.className || ''}`}
       disabled={isLoading || props.disabled}
     >
       {isLoading && (

@@ -78,6 +78,7 @@ export default function LoginScreen() {
             <LoadingButton
               type="submit"
               isLoading={isSubmitting}
+              className="w-full"
             >
               Masuk
             </LoadingButton>

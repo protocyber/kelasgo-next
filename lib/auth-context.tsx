@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { login as loginApi } from "@/screens/login/login.api";
+import { login as loginApi } from "@/lib/api/login/login.api";
 import { refreshToken as refreshTokenApi } from "@/lib/refresh-token.api";
 
 export interface User {

@@ -1,9 +1,14 @@
-import { z } from 'zod';
-import { createTenant } from './create-tenant.api';
+import { useTenantFunc } from '@/lib/api/tenant/tenant.func';
 import { CreateTenantInput } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 // Schema validation untuk form
-export const createTenantSchema = z.object({
+export const CreateTenantSchema = z.object({
   name: z
     .string()
     .min(1, 'Nama wajib diisi')
@@ -27,10 +32,10 @@ export const createTenantSchema = z.object({
   address: z.string().optional().or(z.literal('')),
 });
 
-export type CreateTenantFormData = z.infer<typeof createTenantSchema>;
+export type CreateTenantFormData = z.infer<typeof CreateTenantSchema>;
 
 // Transform form data ke format API
-export function transformFormDataToInput(
+function transformFormDataToInput(
   data: CreateTenantFormData
 ): CreateTenantInput {
   return {
@@ -43,13 +48,67 @@ export function transformFormDataToInput(
 }
 
 // Action untuk submit tenant
-export async function createTenantAction(input: CreateTenantInput) {
-  return createTenant(input);
+export function useCreateTenantAction() {
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const { createTenantMutation } = useTenantFunc({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSuccess: (response: any) => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+
+      const message = onSuccess(response);
+      toast.success(message);
+      setOpen(false);
+      reset();
+      setError(null);
+    },
+    onError: (err: unknown) => {
+      const message = onError(err);
+      setError(message);
+    },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<CreateTenantFormData>({
+    resolver: zodResolver(CreateTenantSchema),
+    defaultValues: {
+      name: '',
+      domain: '',
+      contactEmail: '',
+      phone: '',
+      address: '',
+    },
+  });
+
+  const onSubmit = async (data: CreateTenantFormData) => {
+    setError(null);
+    const input = transformFormDataToInput(data);
+    await createTenantMutation.mutateAsync(input);
+  };
+
+  return {
+    open,
+    setOpen,
+    error,
+    isSubmitting,
+    register,
+    handleSubmit,
+    onSubmit,
+    errors,
+    reset,
+    setError,
+  };
 }
 
 // Handler untuk success response
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function handleTenantCreationSuccess(response: any) {
+function onSuccess(response: any) {
   // Save tenant info and tokens to localStorage
   if (response?.data?.tenant) {
     localStorage.setItem('tenant', JSON.stringify(response.data.tenant));
@@ -74,7 +133,7 @@ export function handleTenantCreationSuccess(response: any) {
 }
 
 // Handler untuk error response
-export function handleTenantCreationError(err: unknown): string {
+function onError(err: unknown): string {
   return (
     (err as { message?: string } | undefined)?.message ||
     'Gagal membuat tenant. Silakan coba lagi.'

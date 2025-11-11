@@ -1,13 +1,8 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import LoadingButton from '@/components/loading-button';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -17,65 +12,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Plus } from "lucide-react";
-import { toast } from "sonner";
-import {
-  createTenantSchema,
-  type CreateTenantFormData,
-  transformFormDataToInput,
-  createTenantAction,
-  handleTenantCreationSuccess,
-  handleTenantCreationError,
-} from "./create-tenant.action";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus } from "lucide-react";
+import { useCreateTenantAction } from './create-tenant.action';
+
 
 export default function CreateTenantModal() {
-  const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    mutationFn: async (values: CreateTenantFormData) => {
-      const input = transformFormDataToInput(values);
-      return createTenantAction(input);
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSuccess: (response: any) => {
-      // Invalidate and refetch tenants list if you have one
-      queryClient.invalidateQueries({ queryKey: ["tenants"] });
-
-      const message = handleTenantCreationSuccess(response);
-      toast.success(message);
-      setOpen(false);
-      reset();
-      setError(null);
-    },
-    onError: (err: unknown) => {
-      const message = handleTenantCreationError(err);
-      setError(message);
-    },
-  });
 
   const {
+    open,
+    setOpen,
+    error,
+    isSubmitting,
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    onSubmit,
+    errors,
     reset,
-  } = useForm<CreateTenantFormData>({
-    resolver: zodResolver(createTenantSchema),
-    defaultValues: {
-      name: "",
-      domain: "",
-      contactEmail: "",
-      phone: "",
-      address: "",
-    },
-  });
-
-  const onSubmit = async (data: CreateTenantFormData) => {
-    setError(null);
-    await mutation.mutateAsync(data);
-  };
+    setError
+  } = useCreateTenantAction();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -188,19 +145,12 @@ export default function CreateTenantModal() {
             >
               Batal
             </Button>
-            <Button
+            <LoadingButton
+              isLoading={isSubmitting}
               type="submit"
-              disabled={isSubmitting || mutation.isPending}
             >
-              {isSubmitting || mutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Membuat...
-                </>
-              ) : (
-                "Buat Tenant"
-              )}
-            </Button>
+              Buat Tenant
+            </LoadingButton>
           </DialogFooter>
         </form>
       </DialogContent>

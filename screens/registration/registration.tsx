@@ -1,14 +1,8 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { register as registrationApi } from "@/screens/registration/registration.api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
+import LoadingButton from '@/components/loading-button';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
@@ -17,52 +11,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { registrationSchema, RegistrationFormData } from "./registration.action";
+import { useRegistrationAction } from "./registration.action";
+
 
 export default function RegistrationScreen() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-
-  const mutation = useMutation({
-    mutationFn: async (values: { full_name: string; email: string; password: string; }) => {
-      return registrationApi(values);
-    },
-    onSuccess: () => {
-      // Setelah registrasi berhasil, arahkan ke halaman login
-      router.push("/login");
-    },
-    onError: (err: unknown) => {
-      const message = (err as { message?: string; } | undefined)?.message ||
-        "Registrasi gagal. Silakan coba lagi.";
-      setError(message);
-    },
-  });
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegistrationFormData>({
-    resolver: zodResolver(registrationSchema),
-    defaultValues: {
-      fullName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
-
-  const onSubmit = async (data: RegistrationFormData) => {
-    setError(null);
-    await mutation.mutateAsync({
-      full_name: data.fullName,
-      email: data.email,
-      password: data.password,
-    });
-  };
+  const { register, handleSubmit, onSubmit, isSubmitting, errors, error } = useRegistrationAction();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -141,17 +97,14 @@ export default function RegistrationScreen() {
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex w-full flex-col gap-3">
-            <Button type="submit" className="w-full" disabled={isSubmitting || mutation.isPending}>
-              {isSubmitting || mutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Membuat akun...
-                </>
-              ) : (
-                "Buat Akun"
-              )}
-            </Button>
+          <CardFooter className="flex w-full flex-col gap-3 mt-4">
+            <LoadingButton
+              isLoading={isSubmitting}
+              type="submit"
+              className="w-full"
+            >
+              Buat Akun
+            </LoadingButton>
             <p className="text-center text-sm text-muted-foreground">
               Sudah punya akun?{" "}
               <Link href="/login" className="underline">Masuk</Link>
